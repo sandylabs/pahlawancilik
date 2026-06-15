@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Pahlawan Cilik - Petualangan Edukasi</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;800;900&display=swap" rel="stylesheet">
+
+    <style>
+        /* ==========================================================================
+           1. PENGATURAN DASAR & VARIABEL WARNA
+           ========================================================================== */
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Nunito', sans-serif; -webkit-tap-highlight-color: transparent; }
+        
+        :root {
+            --hijau-lumut: #8A9A5B; --hijau-asparagus: #7B906F; --hijau-cerah: #A0E8AF;
+            --biru-air: #D4F1F4; --biru-langit: #70a1ff;
+            --kuning-cerah: #FFD166; --kuning-gelap: #f39c12;
+            --merah-muda: #ffaaa5; --merah-tegas: #e74c3c;
+            --putih-krem: #FDFBF7; --teks-gelap: #2D3748; 
+        }
+
+        body, html {
+            width: 100%; height: 100%; 
+            background: radial-gradient(circle at top, var(--biru-air), var(--putih-krem));
+            color: var(--teks-gelap); 
+            overflow: hidden; 
+            display: flex; align-items: center; justify-content: center; 
+            padding: clamp(10px, 2vh, 20px);
+        }
+
+        /* ==========================================================================
+           2. WADAH KACA UTAMA
+           ========================================================================== */
+        .gaya-kaca {
+            background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+            border-radius: clamp(20px, 4vw, 40px); border: 4px solid rgba(255, 255, 255, 0.9);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15); 
+            padding: clamp(15px, 3vh, 30px);
+            width: 100%; max-width: 900px; 
+            height: 100%; max-height: 850px; 
+            display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
+            overflow-y: auto; overflow-x: hidden;
+            -ms-overflow-style: none; scrollbar-width: none;
+        }
+        .gaya-kaca::-webkit-scrollbar { display: none; }
+
+        /* ==========================================================================
+           3. TIPOGRAFI, TOMBOL, & LOGO
+           ========================================================================== */
+        h1 { font-size: clamp(1.8rem, 4vh, 3rem); margin-bottom: 5px; font-weight: 900; text-align: center; text-shadow: 1px 1px 0px white; line-height: 1.2;}
+        h2 { font-size: clamp(1.4rem, 3.5vh, 2.2rem); margin-bottom: 5px; font-weight: 900; text-align: center; }
+        p { font-size: clamp(0.95rem, 2.5vh, 1.3rem); line-height: 1.4; margin-bottom: 10px; font-weight: 800; background: rgba(255,255,255,0.7); padding: 5px 15px; border-radius: 15px; text-align: center; width: 100%; max-width: 600px;}
+        
+        .t-bumi { color: var(--hijau-lumut); } .t-kes { color: var(--kuning-gelap); } .t-siaga { color: var(--merah-tegas); }
+
+        .tombol-utama { 
+            background-color: var(--kuning-cerah); color: var(--teks-gelap); 
+            border: 4px solid white; border-radius: 50px; padding: clamp(12px, 2.5vh, 20px) clamp(25px, 5vw, 40px); 
+            font-size: clamp(1.1rem, 3vh, 1.6rem); font-weight: 900; cursor: pointer; 
+            box-shadow: 0 8px 0px #e6b89c; transition: transform 0.1s, box-shadow 0.1s; margin-top: 10px; z-index: 100;
+        }
+        .tombol-utama:active { transform: translateY(8px); box-shadow: 0 0px 0px #e6b89c; }
+
+        .tombol-kembali { 
+            display: inline-block; align-self: flex-start;
+            margin-bottom: 10px; background: white; 
+            border: 3px solid var(--hijau-asparagus); border-radius: 15px; padding: 6px 15px; 
+            font-size: clamp(0.85rem, 2vh, 1.1rem); font-weight: 900; color: var(--hijau-asparagus); 
+            cursor: pointer; z-index: 100; box-shadow: 0 4px 0px var(--hijau-asparagus); transition: transform 0.1s;
+        }
+        .tombol-kembali:active { transform: translateY(4px); box-shadow: 0 0px 0px var(--hijau-asparagus); }
+
+        /* WADAH LOGO POJOK KANAN ATAS */
+        .wadah-logo-pojok {
+            position: absolute;
+            top: clamp(15px, 3vh, 25px);
+            right: clamp(15px, 3vw, 25px);
+            display: flex;
+            gap: clamp(8px, 2vw, 15px);
+            z-index: 100;
+        }
+        .logo-pojok {
+            width: clamp(40px, 10vw, 70px);
+            height: clamp(40px, 10vw, 70px);
+            object-fit: contain;
+            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));
+        }
+
+        /* ==========================================================================
+           4. HALAMAN & MENU UTAMA
+           ========================================================================== */
+        .bagian-halaman { display: none; width: 100%; height: 100%; flex-direction: column; align-items: center; justify-content: flex-start; position: relative;}
+        .layar-tengah { justify-content: center; }
+        .bagian-aktif { display: flex; animation: muncul 0.4s ease-out forwards; }
+        @keyframes muncul { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+
+        .wadah-menu { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; width: 100%; align-content: start; margin-top: 10px; padding-bottom: 10px;}
+        .kartu-menu { 
+            background: white; border-radius: 25px; padding: clamp(15px, 3vh, 25px); cursor: pointer; 
+            box-shadow: 0 8px 0px rgba(0,0,0,0.1); transition: transform 0.1s; 
+            display: flex; flex-direction: column; align-items: center; text-align: center; border: 5px solid;
+        }
+        .kartu-menu:active { transform: translateY(8px); box-shadow: 0 0px 0px rgba(0,0,0,0.1); }
+        .kartu-menu:nth-child(1) { border-color: var(--hijau-lumut); }
+        .kartu-menu:nth-child(2) { border-color: var(--kuning-gelap); }
+        .kartu-menu:nth-child(3) { border-color: var(--merah-muda); }
+        
+        .ikon-menu { font-size: clamp(3.5rem, 8vh, 5rem); margin-bottom: 5px; filter: drop-shadow(0 5px 5px rgba(0,0,0,0.1));}
+        .judul-menu { font-size: clamp(1.2rem, 2.5vh, 1.6rem); font-weight: 900; margin-bottom: 5px; line-height: 1.1;}
+
+        /* ==========================================================================
+           5. AREA PERMAINAN & ANIMASI
+           ========================================================================== */
+        .papan-permainan { display: flex; flex-direction: column; align-items: center; flex: 1; width: 100%; position: relative; min-height: 0; }
+        .panel-berhasil { display: none; position: absolute; top: -10px; left: -10px; width: calc(100% + 20px); height: calc(100% + 20px); background: rgba(255,255,255,0.95); flex-direction: column; align-items: center; justify-content: center; border-radius: 30px; z-index: 200; animation: loncat 0.5s; }
+        @keyframes loncat { 0% { transform: scale(0.8); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+
+        .item-seret { position: absolute; cursor: grab; user-select: none; z-index: 50; touch-action: none; display: flex; align-items: center; justify-content: center; }
+        .item-seret:active { cursor: grabbing; z-index: 9999; }
+        .item-klik { cursor: pointer; touch-action: manipulation; transition: transform 0.1s; }
+        .item-klik:active { transform: scale(0.85); }
+        .objek-hancur { opacity: 0 !important; transform: scale(0) !important; pointer-events: none; transition: all 0.2s;}
+
+        @keyframes mengambang { 0%, 100% { transform: translateY(0px) rotate(-3deg); } 50% { transform: translateY(-10px) rotate(3deg); } }
+        @keyframes denyut { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+        
+        .emoji-animasi { font-size: clamp(3rem, 8vh, 4.5rem); animation: mengambang 2.5s infinite ease-in-out; filter: drop-shadow(0 6px 8px rgba(0,0,0,0.2)); }
+        .emoji-jumbo { font-size: clamp(5rem, 15vh, 8rem); filter: drop-shadow(0 8px 10px rgba(0,0,0,0.15)); }
+
+        .area-bebas-drag { flex: 1; width: 100%; min-height: 150px; position: relative; background: rgba(255,255,255,0.4); border-radius: 25px; border: 3px dashed white; overflow: visible; }
+        .area-target-bawah { display: flex; gap: 15px; width: 100%; justify-content: center; flex-wrap: wrap; flex-shrink: 0; margin-top: auto; padding-top: 15px; }
+
+        /* ==========================================================================
+           6. SPESIFIK BUMI
+           ========================================================================== */
+        .tong-sampah { flex: 1; padding: 10px; border: 5px solid white; border-radius: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: clamp(1.1rem, 2.5vh, 1.4rem); font-weight: 900; animation: denyut 2s infinite; box-shadow: 0 6px 0 rgba(0,0,0,0.1);}
+        .tong-organik { background: var(--hijau-cerah); color: var(--hijau-lumut); }
+        .tong-anorganik { background: var(--merah-muda); color: #c62828; }
+
+        .area-selokan { flex: 1; min-height: 120px; width: 100%; background: #95a5a6; border-radius: 25px; border: 6px solid #7f8c8d; display: flex; align-items: center; justify-content: space-evenly; flex-wrap: wrap; position: relative; overflow: hidden; margin-top: 10px;}
+        .batu-penyumbat { width: clamp(45px, 10vh, 70px); height: clamp(35px, 8vh, 60px); background: #8d6e63; border: 3px solid #5d4037; border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%; z-index: 5; box-shadow: inset -5px -5px 0 rgba(0,0,0,0.3);}
+        .air-mengalir { position: absolute; left: -100%; width: 100%; height: 100%; background: rgba(168, 230, 207, 0.9); transition: left 1.5s; }
+
+        .area-tanah { flex: 1; min-height: 120px; display: flex; gap: 15px; justify-content: center; align-items: center; flex-wrap: wrap; padding: 15px; background: rgba(138, 154, 91, 0.15); border-radius: 25px; width: 100%; margin-top: 10px;}
+        .bibit-pohon { font-size: clamp(3rem, 10vh, 5rem); width: clamp(80px, 15vh, 120px); height: clamp(80px, 15vh, 120px); display: flex; align-items: center; justify-content: center; background: white; border-radius: 50%; border: 5px solid var(--hijau-asparagus); box-shadow: 0 6px 0 rgba(0,0,0,0.1);}
+
+        .area-banjir { flex: 1; min-height: 150px; width: 100%; background: rgba(168, 230, 207, 0.4); border-radius: 25px; border: 5px solid var(--biru-air); position: relative; display: flex; align-items: flex-end; justify-content: center; padding-bottom: 5px; overflow: hidden; margin-top: 10px;}
+        .karung-pasir { width: clamp(80px, 18vw, 120px); height: clamp(25px, 5vh, 40px); background: #d2b48c; border: 3px solid #8b4513; border-radius: 10px; display: none; align-items: center; justify-content: center; font-weight: 900; color: #5c4033; font-size: clamp(0.9rem, 2vh, 1.1rem); margin-bottom: 2px; box-shadow: inset -3px -3px 0 rgba(0,0,0,0.1); z-index: 10;}
+
+        .area-evakuasi { flex: 1; min-height: 150px; width: 100%; position: relative; border-radius: 25px; border: 5px dashed var(--merah-muda); background: rgba(255,255,255,0.6); display: flex; overflow: visible; margin-top: 10px;}
+        .area-hewan-kiri { width: 50%; height: 100%; position: relative; }
+        .bukit-aman { width: 50%; height: 100%; background: var(--hijau-cerah); border-left: 5px solid white; border-top-left-radius: 100px; display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 5px; padding: 15px; animation: denyut 2s infinite; position: absolute; right: 0; bottom: 0; z-index: 1;}
+
+        /* ==========================================================================
+           7. SPESIFIK KESEHATAN
+           ========================================================================== */
+        .meja-kuman { flex: 1; min-height: 150px; width: 100%; background: white; border: 6px solid var(--hijau-asparagus); border-radius: 25px; position: relative; display: flex; align-items: center; justify-content: center; box-shadow: 0 8px 0 rgba(0,0,0,0.05); overflow: hidden; margin-top: 10px;}
+        .kaki-kotor { font-size: clamp(4rem, 12vh, 7rem); filter: drop-shadow(0 6px 8px rgba(0,0,0,0.2)); background: rgba(255,255,255,0.6); border-radius: 25px; padding: 15px; border: 4px dashed var(--merah-muda); }
+        .bak-air { position: absolute; bottom: -10px; right: 5%; width: clamp(100px, 20vw, 150px); height: clamp(90px, 15vh, 120px); background: #3498db; border: 5px solid white; border-radius: 10px 10px 40px 40px; display: flex; justify-content: center; align-items: flex-start; animation: denyut 2s infinite; box-shadow: 0 8px 0 rgba(0,0,0,0.1); z-index: 1;}
+
+        /* ==========================================================================
+           8. SPESIFIK SIAGA
+           ========================================================================== */
+        .kotak-alat { background: white; border-radius: 25px; padding: 20px; border: 5px solid var(--biru-langit); box-shadow: 0 6px 0 rgba(0,0,0,0.1); display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .lemari { background: #e67e22; border: 5px solid white; border-radius: 15px; width: clamp(120px, 25vw, 160px); height: clamp(150px, 30vh, 200px); position: absolute; right: 5%; bottom: -5px; display: flex; flex-direction: column; box-shadow: 0 8px 0 rgba(0,0,0,0.1); overflow: hidden; z-index: 1;}
+        .laci { flex: 1; border-bottom: 4px solid white; display: flex; align-items: center; justify-content: center; background: #f39c12; font-weight: 900; color: white; font-size: clamp(1rem, 2.5vh, 1.3rem);}
+        #laci-atas { background: #d35400; animation: denyut 2s infinite;}
+
+    </style>
+</head>
+<body>
+
+    <!-- ==========================================================================
+         MUSIK LATAR CERIA (BGM) MULTI-SOURCE
+         Musik petualangan panjang, stabil, dan ramah anak.
+         ========================================================================== -->
+    <audio id="musik-latar" loop preload="auto">
+        <source src="https://cdn.pixabay.com/download/audio/2022/10/18/audio_31c2730e64.mp3?filename=happy-kids-122938.mp3" type="audio/mpeg">
+        <source src="https://assets.mixkit.co/music/preview/mixkit-happy-times-158.mp3" type="audio/mpeg">
+        <source src="https://www.soundjay.com/free-music/sounds/carefree-1.mp3" type="audio/mpeg">
+    </audio>
+
+    <div class="gaya-kaca">
+        
+        <!-- ==================== A. LAYAR PEMBUKA ==================== -->
+        <div class="bagian-halaman bagian-aktif layar-tengah" id="layar-mulai">
+            
+            <!-- LOGO POJOK KANAN ATAS -->
+            <div class="wadah-logo-pojok">
+                <!-- Ganti src di bawah ini dengan link gambar aslinya -->
+                <img src="assets/unsurya.png" alt="Logo Unsurya" class="logo-pojok">
+                <img src="assets/bonpal.png" alt="Logo Kebon Pala" class="logo-pojok">
+            </div>
+
+            <div class="emoji-jumbo" style="margin-bottom: 10px;">🐸</div>
+            <h1 class="t-bumi">Buku Pahlawan Cilik</h1>
+            <p>Ayo belajar menjaga bumi dan diri kita bersama Kiko!</p>
+            <button class="tombol-utama" style="margin-top: 15px;" onclick="mulaiAplikasi()">Mulai Bermain 🎵</button>
+        </div>
+
+        <!-- ==================== B. MENU UTAMA ==================== -->
+        <div class="bagian-halaman" id="halaman-menu">
+            <button class="tombol-kembali" onclick="kembaliKeHome()">🐸 Kembali ke Awal</button>
+            
+            <h1 class="t-bumi">Pilih Petualangan</h1>
+            <div class="wadah-menu">
+                <div class="kartu-menu" onclick="bukaMisi('bumi-1')">
+                    <div class="ikon-menu">🌍</div>
+                    <div class="judul-menu t-bumi">Pahlawan Bumi</div>
+                    <p style="background:none; margin:0; padding:0; font-size:0.95em;">5 Misi Cegah Banjir</p>
+                </div>
+                <div class="kartu-menu" onclick="bukaMisi('kes-1')">
+                    <div class="ikon-menu">🧼</div>
+                    <div class="judul-menu t-kes">Pahlawan Kesehatan</div>
+                    <p style="background:none; margin:0; padding:0; font-size:0.95em;">6 Misi Bersih Sehat</p>
+                </div>
+                <div class="kartu-menu" onclick="bukaMisi('siaga-1')">
+                    <div class="ikon-menu">🎒</div>
+                    <div class="judul-menu t-siaga">Pahlawan Siaga</div>
+                    <p style="background:none; margin:0; padding:0; font-size:0.95em;">6 Misi Keselamatan</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== C. PAHLAWAN BUMI ==================== -->
+        <div class="bagian-halaman" id="bumi-1">
+            <button class="tombol-kembali" onclick="kembaliMenu()">⬅️ Menu Utama</button>
+            <div class="papan-permainan">
+                <h2 class="t-bumi">Misi 1: Pilah Sampah</h2>
+                <p>Seret sampah ke tong yang tepat!</p>
+                
+                <div class="area-bebas-drag">
+                    <div class="item-seret b-sampah" data-jenis="organik" style="top:10%; left:10%;"><div class="emoji-animasi">🍌</div></div>
+                    <div class="item-seret b-sampah" data-jenis="non-organik" style="top:50%; left:30%;"><div class="emoji-animasi" style="animation-delay: 0.5s;">🥤</div></div>
+                    <div class="item-seret b-sampah" data-jenis="organik" style="top:20%; left:60%;"><div class="emoji-animasi" style="animation-delay: 1s;">🍎</div></div>
+                    <div class="item-seret b-sampah" data-jenis="non-organik" style="top:45%; left:80%;"><div class="emoji-animasi" style="animation-delay: 1.5s;">🥫</div></div>
+                </div>
+                
+                <div class="area-target-bawah">
+                    <div class="tong-sampah tong-organik" data-terima="organik"><span style="font-size: 2.5em; margin-bottom: 5px;">🍃</span>Organik</div>
+                    <div class="tong-sampah tong-anorganik" data-terima="non-organik"><span style="font-size: 2.5em; margin-bottom: 5px;">♻️</span>Non Organik</div>
+                </div>
+
+                <div class="panel-berhasil" id="sukses-bumi-1">
+                    <div class="emoji-jumbo">✨👏✨</div><h1 class="t-bumi">Hebat Sekali!</h1>
+                    <button class="tombol-utama" onclick="bukaMisi('bumi-2')">Lanjut ➡️</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="bagian-halaman" id="bumi-2">
+            <button class="tombol-kembali" onclick="kembaliMenu()">⬅️ Menu Utama</button>
+            <div class="papan-permainan">
+                <h2 class="t-bumi">Misi 2: Selokan Bersih</h2>
+                <p>Sentuh batu cokelat yang menyumbat air!</p>
+                
+                <div class="area-selokan">
+                    <div class="air-mengalir" id="air-bumi"></div>
+                    <div class="batu-penyumbat item-klik b-batu" onclick="hancurBatuBumi(this)"></div>
+                    <div class="batu-penyumbat item-klik b-batu" onclick="hancurBatuBumi(this)"></div>
+                    <div class="batu-penyumbat item-klik b-batu" onclick="hancurBatuBumi(this)"></div>
+                    <div class="batu-penyumbat item-klik b-batu" onclick="hancurBatuBumi(this)"></div>
+                </div>
+                
+                <div class="panel-berhasil" id="sukses-bumi-2">
+                    <div class="emoji-jumbo">🌊</div><h1 class="t-bumi">Air Mengalir!</h1>
+                    <button class="tombol-utama" onclick="bukaMisi('bumi-3')">Lanjut ➡️</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="bagian-halaman" id="bumi-3">
+            <button class="tombol-kembali" onclick="kembaliMenu()">⬅️ Menu Utama</button>
+            <div class="papan-permainan">
+                <h2 class="t-bumi">Misi 3: Tanam Pohon</h2>
+                <p>Sentuh bibit tanah berkali-kali!</p>
+                
+                <div class="area-tanah">
+                    <div class="bibit-pohon item-klik" onclick="tumbuhPohonBumi(this)" data-tahap="0">🟤</div>
+                    <div class="bibit-pohon item-klik" onclick="tumbuhPohonBumi(this)" data-tahap="0">🟤</div>
+                    <div class="bibit-pohon item-klik" onclick="tumbuhPohonBumi(this)" data-tahap="0">🟤</div>
+                </div>
+
+                <div class="panel-berhasil" id="sukses-bumi-3">
+                    <div class="emoji-jumbo">🌳</div><h1 class="t-bumi">Akar Kuat!</h1>
+                    <button class="tombol-utama" onclick="bukaMisi('bumi-4')">Lanjut ➡️</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="bagian-halaman" id="bumi-4">
+            <button class="tombol-kembali" onclick="kembaliMenu()">⬅️ Menu Utama</button>
+            <div class="papan-permainan">
+                <h2 class="t-bumi">Misi 4: Susun Tanggul</h2>
+                <p>Air meluap! Sentuh tombol letakkan karung.</p>
+                
+                <div class="area-banjir">
+                    <div style="font-size: clamp(4em, 12vh, 6em); position: absolute; left: 5%; bottom: 0; z-index:2;">🏠</div>
+                    <div style="display: flex; flex-direction: column-reverse; z-index: 5; height: 90%; justify-content: flex-start;">
+                        <div class="karung-pasir" id="kb1">Pasir</div>
+                        <div class="karung-pasir" id="kb2">Pasir</div>
+                        <div class="karung-pasir" id="kb3">Pasir</div>
+                    </div>
+                    <div style="font-size: clamp(3em, 10vh, 5em); position: absolute; right: 5%; bottom: 0; animation: mengambang 1.5s infinite alternate; z-index:1;">🌊</div>
+                </div>
+                
+                <button class="tombol-utama" onclick="tambahKarungBumi()">➕ Letakkan Karung</button>
+
+                <div class="panel-berhasil" id="sukses-bumi-4">
+                    <div class="emoji-jumbo">🧱</div><h1 class="t-bumi">Rumah Aman!</h1>
+                    <button class="tombol-utama" onclick="bukaMisi('bumi-5')">Lanjut ➡️</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="bagian-halaman" id="bumi-5">
+            <button class="tombol-kembali" onclick="kembaliMenu()">⬅️ Menu Utama</button>
+            <div class="papan-permainan">
+                <h2 class="t-bumi">Misi 5: Evakuasi Hewan</h2>
+                <p>Geser semua hewan ke Bukit Aman!</p>
+                
+                <div class="area-evakuasi" style="overflow:visible;"> <!-- Override overflow agar hewan bebas digeser -->
+                    <div class="area-hewan-kiri">
+                        <div class="item-seret b-hewan" style="top: 10%; left: 10%;"><div class="emoji-animasi">🐈</div></div>
+                        <div class="item-seret b-hewan" style="top: 50%; left: 40%;"><div class="emoji-animasi" style="animation-delay: 0.5s;">🐕</div></div>
+                        <div class="item-seret b-hewan" style="top: 30%; left: 60%;"><div class="emoji-animasi" style="animation-delay: 1s;">🐓</div></div>
+                    </div>
+                    <div class="bukit-aman" id="bukit-bumi">
+                        <span style="color:var(--hijau-lumut); font-weight:900; font-size:clamp(1rem, 2.5vh, 1.2rem); background:white; padding:5px 10px; border-radius:20px;">Bukit Aman ⛰️</span>
+                    </div>
+                </div>
+
+                <div class="panel-berhasil" id="sukses-bumi-5">
+                    <div class="emoji-jumbo">🏅</div><h1 class="t-bumi">Misi Selesai!</h1>
+                    <button class="tombol-utama" onclick="kembaliMenu()">Hore! 🌟</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== D. PAHLAWAN KESEHATAN ==================== -->
+        <div class="bagian-halaman" id="kes-1">
+            <button class="tombol-kembali" onclick="kembaliMenu()">⬅️ Menu Utama</button>
+            <div class="papan-permainan">
+                <h2 class="t-kes">Misi 1: Cuci Tangan</h2>
+                <p>Kuman menempel! Seret sabun ke tangan.</p>
+                
+                <div class="area-bebas-drag" style="background: transparent; border: none;">
+                    <div class="item-seret k-sabun" style="top: 10%; left: 10%; z-index: 20;"><div class="emoji-animasi" style="font-size: clamp(4em, 12vh, 6em);">🧼</div></div>
+                    <div class="emoji-jumbo" id="k-tangan" style="position: absolute; right: 5%; bottom: 10%; animation: denyut 2s infinite; z-index: 1;">🖐🏽🦠</div>
+                </div>
+
+                <div class="panel-berhasil" id="sukses-kes-1">
+                    <div class="emoji-jumbo">🖐🏻✨</div><h1 class="t-kes">Tangan Bersih!</h1>
+                    <button class="tombol-utama" onclick="bukaMisi('kes-2')">Lanjut ➡️</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="bagian-halaman" id="kes-2">
+            <button class="tombol-kembali" onclick="kembaliMenu()">⬅️ Menu Utama</button>
+            <div class="papan-permainan">
+                <h2 class="t-kes">Misi 2: Sepatu Bot</h2>
+                <p>Sentuh kaki agar aman dari air kotor!</p>
+                
+                <div style="display: flex; gap: 30px; margin-top: auto; margin-bottom: auto;">
+                    <div class="kaki-kotor item-klik k-kaki" onclick="pakaiBotKes(this)">🦶</div>
+                    <div class="kaki-kotor item-klik k-kaki" onclick="pakaiBotKes(this)">🦶</div>
+                </div>
+
+                <div class="panel-berhasil" id="sukses-kes-2">
+                    <div class="emoji-jumbo">🥾</div><h1 class="t-kes">Kaki Terlindungi!</h1>
+                    <button class="tombol-utama" onclick="bukaMisi('kes-3')">Lanjut ➡️</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="bagian-halaman" id="kes-3">
+            <button class="tombol-kembali" onclick="kembaliMenu()">⬅️ Menu Utama</button>
+            <div class="papan-permainan">
+                <h2 class="t-kes">Misi 3: Jaga Makanan</h2>
+                <p>Sentuh kuman jahat di dekat makanan!</p>
+                
+                <div class="meja-kuman">
+                    <div style="font-size: clamp(4em, 12vh, 6em);">🍱🥛</div>
+                    <div class="kuman-jahat item-klik" onclick="basmiKumanKes(this)" style="position:absolute; top: 15%; left: 15%; font-size:clamp(3.5em, 10vh, 5em);">🦠</div>
+                    <div class="kuman-jahat item-klik" onclick="basmiKumanKes(this)" style="position:absolute; bottom: 15%; left: 30%; font-size:clamp(3.5em, 10vh, 5em);">🦠</div>
+                    <div class="kuman-jahat item-klik" onclick="basmiKumanKes(this)" style="position:absolute; top: 25%; right: 15%; font-size:clamp(3.5em, 10vh, 5em);">🦠</div>
+                </div>
+
+                <div class="panel-berhasil" id="sukses-kes-3">
+                    <div class="emoji-jumbo">🍽️</div><h1 class="t-kes">Bebas Kuman!</h1>
+                    <button class="tombol-utama" onclick="bukaMisi('kes-4')">Lanjut ➡️</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="bagian-halaman" id="kes-4">
+            <button class="tombol-kembali" onclick="kembaliMenu()">⬅️ Menu Utama</button>
+            <div class="papan-permainan">
+                <h2 class="t-kes">Misi 4: Tutup Bak Air</h2>
+                <p>Seret tutup ke bak agar nyamuk hilang!</p>
+                
+                <div class="area-bebas-drag" style="border:none; background:transparent;">
+                    <div class="item-seret k-tutup" style="top: 10%; left: 10%; z-index: 20;"><div class="emoji-animasi" style="font-size: clamp(5em, 15vh, 8em);">🛸</div></div>
+                    <div class="bak-air" id="k-bak">
+                        <span style="font-size:clamp(3.5em, 10vh, 5em); margin-top:-40px;">🦟</span>
+                    </div>
+                </div>
+
+                <div class="panel-berhasil" id="sukses-kes-4">
+                    <div class="emoji-jumbo">🚰</div><h1 class="t-kes">Bebas Nyamuk!</h1>
+                    <button class="tombol-utama" onclick="bukaMisi('kes-5')">Lanjut ➡️</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="bagian-halaman" id="kes-5">
+            <button class="tombol-kembali" onclick="kembaliMenu()">⬅️ Menu Utama</button>
+            <div class="papan-permainan">
+                <h2 class="t-kes">Misi 5: Mandi Bersih</h2>
+                <p>Sentuh lumpur di badan agar bersih!</p>
+                
+                <div style="position:relative; margin-top:auto; margin-bottom:auto;">
+                    <div class="emoji-jumbo" style="font-size: clamp(6em, 20vh, 10em);">🧒🏽</div>
+                    <div class="kuman-jahat item-klik" onclick="mandiKes(this)" style="position:absolute; top:20%; left:-10%; font-size:clamp(2.5em, 6vh, 4em);">💩</div>
+                    <div class="kuman-jahat item-klik" onclick="mandiKes(this)" style="position:absolute; bottom:20%; right:-10%; font-size:clamp(2.5em, 6vh, 4em);">💩</div>
+                </div>
+
+                <div class="panel-berhasil" id="sukses-kes-5">
+                    <div class="emoji-jumbo">🧒🏻✨</div><h1 class="t-kes">Segar & Wangi!</h1>
+                    <button class="tombol-utama" onclick="bukaMisi('kes-6')">Lanjut ➡️</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="bagian-halaman" id="kes-6">
+            <button class="tombol-kembali" onclick="kembaliMenu()">⬅️ Menu Utama</button>
+            <div class="papan-permainan">
+                <h2 class="t-kes">Misi 6: Air Minum</h2>
+                <p>Mana air yang aman untuk diminum?</p>
+                
+                <div style="display:flex; gap:15px; margin-top:auto; margin-bottom:auto; width: 100%; justify-content:center;">
+                    <div class="kotak-alat item-klik" onclick="salahPilih()" style="border-color:var(--merah-tegas); background:#ffebee; flex:1; max-width:200px;">
+                        <div style="font-size: clamp(3em, 10vh, 5em);">🟤</div>
+                        <span style="font-size:1.1em; font-weight:900; color:var(--merah-tegas); margin-top:10px;">Air Banjir</span>
+                    </div>
+                    <div class="kotak-alat item-klik" onclick="benarMinum()" style="border-color:var(--hijau-lumut); background:#e8f5e9; flex:1; max-width:200px;">
+                        <div style="font-size: clamp(3em, 10vh, 5em);">🥛</div>
+                        <span style="font-size:1.1em; font-weight:900; color:var(--hijau-lumut); margin-top:10px;">Air Matang</span>
+                    </div>
+                </div>
+
+                <div class="panel-berhasil" id="sukses-kes-6">
+                    <div class="emoji-jumbo">🏅</div><h1 class="t-kes">Misi Selesai!</h1>
+                    <button class="tombol-utama" onclick="kembaliMenu()">Hore! 🌟</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== E. PAHLAWAN SIAGA ==================== -->
+        <div class="bagian-halaman" id="siaga-1">
+            <button class="tombol-kembali" onclick="kembaliMenu()">⬅️ Menu Utama</button>
+            <div class="papan-permainan">
+                <h2 class="t-siaga">Misi 1: Matikan Listrik</h2>
+                <p>Air masuk rumah! Sentuh tombol listrik.</p>
+                
+                <div class="kotak-alat item-klik" id="s-saklar" onclick="matikanListrik()" style="width:clamp(150px, 25vh, 200px); height:clamp(150px, 25vh, 200px); border-radius: 50%; justify-content:center; margin-top: auto; margin-bottom: auto;">
+                    <div style="font-size: clamp(4em, 12vh, 7em); filter: drop-shadow(0 0 15px #f1c40f);">💡</div>
+                </div>
+
+                <div class="panel-berhasil" id="sukses-siaga-1">
+                    <div class="emoji-jumbo">🔌</div><h1 class="t-siaga">Aman dari Setrum!</h1>
+                    <button class="tombol-utama" onclick="bukaMisi('siaga-2')">Lanjut ➡️</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="bagian-halaman" id="siaga-2">
+            <button class="tombol-kembali" onclick="kembaliMenu()">⬅️ Menu Utama</button>
+            <div class="papan-permainan">
+                <h2 class="t-siaga">Misi 2: Cabut Kabel</h2>
+                <p>Sentuh kabel agar terlepas dari dinding.</p>
+                
+                <div style="position:relative; width:150px; height:250px; background:rgba(255,255,255,0.7); border-radius:30px; display:flex; justify-content:center; margin-top:auto; margin-bottom:auto; border: 4px solid #bdc3c7;">
+                    <div style="font-size:clamp(4em, 12vh, 6em); position:absolute; top:10px; z-index:1;">🔌</div>
+                    <div class="item-klik" id="s-kabel" onclick="cabutKabel()" style="font-size:clamp(4em, 12vh, 6em); position:absolute; top:60px; transition:top 0.4s ease-in; z-index:2;">
+                        🔌<span style="font-size:0.5em; position:absolute; top:50px; left:30%; animation:denyut 0.5s infinite;">⚡</span>
+                    </div>
+                </div>
+
+                <div class="panel-berhasil" id="sukses-siaga-2">
+                    <div class="emoji-jumbo">✅</div><h1 class="t-siaga">Kabel Aman!</h1>
+                    <button class="tombol-utama" onclick="bukaMisi('siaga-3')">Lanjut ➡️</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="bagian-halaman" id="siaga-3">
+            <button class="tombol-kembali" onclick="kembaliMenu()">⬅️ Menu Utama</button>
+            <div class="papan-permainan">
+                <h2 class="t-siaga">Misi 3: Tas Darurat</h2>
+                <p>Seret Senter, P3K, dan Baju ke tas!</p>
+                
+                <div class="area-bebas-drag" style="border:none; background:transparent;">
+                    <div class="item-seret s-tas-item" style="top:10%; left:10%;"><div class="emoji-animasi">🔦</div></div>
+                    <div class="item-seret s-tas-item" style="top:50%; left:30%;"><div class="emoji-animasi" style="animation-delay:0.5s;">💊</div></div>
+                    <div class="item-seret s-tas-item" style="top:20%; left:50%;"><div class="emoji-animasi" style="animation-delay:1s;">👕</div></div>
+                    <div id="s-tas" class="emoji-jumbo" style="position:absolute; bottom:0; right:5%; transition:transform 0.2s; animation: denyut 2s infinite; z-index: 1;">🎒</div>
+                </div>
+
+                <div class="panel-berhasil" id="sukses-siaga-3">
+                    <div class="emoji-jumbo">🎒✨</div><h1 class="t-siaga">Tas Siap!</h1>
+                    <button class="tombol-utama" onclick="bukaMisi('siaga-4')">Lanjut ➡️</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="bagian-halaman" id="siaga-4">
+            <button class="tombol-kembali" onclick="kembaliMenu()">⬅️ Menu Utama</button>
+            <div class="papan-permainan">
+                <h2 class="t-siaga">Misi 4: Amankan Surat</h2>
+                <p>Seret dokumen ke laci paling <strong>Atas</strong>!</p>
+                
+                <div class="area-bebas-drag" style="border:none; background:transparent;">
+                    <div class="item-seret s-dok" style="bottom:10%; left:10%; z-index: 10;"><div class="emoji-animasi" style="font-size: clamp(3.5em, 10vh, 5em);">📁</div></div>
+                    <div class="lemari">
+                        <div class="laci" id="laci-atas">Atas</div>
+                        <div class="laci">Tengah</div>
+                        <div class="laci">Bawah</div>
+                    </div>
+                </div>
+
+                <div class="panel-berhasil" id="sukses-siaga-4">
+                    <div class="emoji-jumbo">📁🛡️</div><h1 class="t-siaga">Surat Aman!</h1>
+                    <button class="tombol-utama" onclick="bukaMisi('siaga-5')">Lanjut ➡️</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="bagian-halaman" id="siaga-5">
+            <button class="tombol-kembali" onclick="kembaliMenu()">⬅️ Menu Utama</button>
+            <div class="papan-permainan">
+                <h2 class="t-siaga">Misi 5: Kunci Pintu</h2>
+                <p>Sebelum pergi, sentuh pintu untuk mengunci.</p>
+                
+                <div class="kotak-alat item-klik" id="s-pintu" onclick="kunciPintu()" style="position:relative; width:clamp(160px, 30vh, 220px); height:clamp(220px, 40vh, 280px); border-color:#8e44ad; background:#f39c12; border-radius: 20px; margin-top:auto; margin-bottom:auto;">
+                    <div style="font-size: clamp(6em, 18vh, 9em);">🚪</div>
+                    <span id="ikon-kunci" style="position:absolute; top:45%; left:35%; font-size:clamp(2em, 6vh, 3.5em); background:white; border-radius:50%; padding:10px; box-shadow: 0 5px 10px rgba(0,0,0,0.2);">🔓</span>
+                </div>
+
+                <div class="panel-berhasil" id="sukses-siaga-5">
+                    <div class="emoji-jumbo">🔒</div><h1 class="t-siaga">Terkunci Rapat!</h1>
+                    <button class="tombol-utama" onclick="bukaMisi('siaga-6')">Lanjut ➡️</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="bagian-halaman" id="siaga-6">
+            <button class="tombol-kembali" onclick="kembaliMenu()">⬅️ Menu Utama</button>
+            <div class="papan-permainan">
+                <h2 class="t-siaga">Misi 6: Perahu Karet</h2>
+                <p>Seret semua orang ke atas perahu!</p>
+                
+                <div class="area-bebas-drag" style="border:none; background:transparent;">
+                    <div class="area-hewan-kiri">
+                        <div class="item-seret s-warga" style="top:10%; left:10%;"><div class="emoji-animasi">👧</div></div>
+                        <div class="item-seret s-warga" style="top:50%; left:30%;"><div class="emoji-animasi" style="animation-delay:0.5s;">👴</div></div>
+                        <div class="item-seret s-warga" style="top:20%; left:60%;"><div class="emoji-animasi" style="animation-delay:1s;">👩</div></div>
+                    </div>
+                    <div id="s-perahu" class="emoji-jumbo" style="position:absolute; bottom:0; right:5%; animation: denyut 2s infinite; z-index: 1;">🛶</div>
+                </div>
+
+                <div class="panel-berhasil" id="sukses-siaga-6">
+                    <div class="emoji-jumbo">🏅</div><h1 class="t-siaga">Misi Selesai!</h1>
+                    <button class="tombol-utama" onclick="kembaliMenu()">Ke Menu Utama 🌟</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ==========================================================================
+         JAVASCRIPT LOGIC & AUDIO
+         ========================================================================== -->
+    <script>
+        // --- 1. MUSIK LATAR (BGM) MULTI-SOURCE ---
+        let musikDimainkan = false;
+        
+        function mainkanMusikBGM() {
+            if (!musikDimainkan) {
+                const bgMusik = document.getElementById('musik-latar');
+                bgMusik.volume = 0.4;
+                
+                let playPromise = bgMusik.play();
+                if (playPromise !== undefined) {
+                    playPromise.then(_ => {
+                        musikDimainkan = true;
+                    }).catch(error => {
+                        console.log("Autoplay dicegah oleh browser. Menunggu klik dari pemain.");
+                    });
+                }
+            }
+        }
+        
+        document.body.addEventListener('pointerdown', () => { mainkanMusikBGM(); }, { once: true });
+
+        // --- 2. MESIN SUARA EFEK (Web Audio API) ---
+        const Ctx = window.AudioContext || window.webkitAudioContext; 
+        let ctx;
+        
+        function initS() { 
+            if(!ctx) ctx = new Ctx(); 
+            if(ctx.state === 'suspended') ctx.resume(); 
+        }
+        
+        function mainkanG(f, t, d) {
+            if(!ctx) return; 
+            const o = ctx.createOscillator(); const g = ctx.createGain();
+            o.type = t; o.frequency.value = f; 
+            g.gain.setValueAtTime(0.1, ctx.currentTime);
+            g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + d);
+            o.connect(g); g.connect(ctx.destination); 
+            o.start(); o.stop(ctx.currentTime + d);
+        }
+        
+        function bPop() { mainkanG(700, 'sine', 0.1); }
+        function bJatuh() { mainkanG(150, 'square', 0.15); }
+        function bBatu() { mainkanG(100, 'sawtooth', 0.2); }
+        function bPohon() { mainkanG(1200, 'sine', 0.2); setTimeout(()=>mainkanG(1600, 'sine', 0.3), 100); }
+        function bSihir() { mainkanG(900, 'sine', 0.1); setTimeout(()=>mainkanG(1200, 'sine', 0.1), 100); }
+        function bSalah() { mainkanG(150, 'sawtooth', 0.3); } 
+        function bWin() { mainkanG(523, 'sine', 0.1); setTimeout(()=>mainkanG(659, 'sine', 0.1), 100); setTimeout(()=>mainkanG(783, 'sine', 0.2), 200); }
+
+        // --- 3. NAVIGASI HALAMAN ---
+        function mulaiAplikasi() { 
+            initS(); bWin(); mainkanMusikBGM();
+            bukaHalaman('halaman-menu'); 
+        }
+        function kembaliMenu() { bPop(); bukaHalaman('halaman-menu'); }
+        function kembaliKeHome() { bPop(); bukaHalaman('layar-mulai'); }
+        function bukaMisi(id) { initS(); bPop(); bukaHalaman(id); }
+        
+        function bukaHalaman(id) {
+            document.querySelectorAll('.bagian-halaman').forEach(h => h.classList.remove('bagian-aktif'));
+            document.getElementById(id).classList.add('bagian-aktif');
+        }
+
+        // --- 4. FUNGSI DRAG & DROP UNIVERSAL ---
+        function setDrag(el, fungsiCek) {
+            let drag = false, ax, ay;
+            
+            el.addEventListener('pointerdown', (e) => { 
+                initS(); mainkanMusikBGM(); bPop(); 
+                drag = true; ax = e.clientX; ay = e.clientY; 
+                el.setPointerCapture(e.pointerId); 
+                el.style.zIndex = 9999; 
+                el.style.transition = 'none'; 
+            });
+            
+            el.addEventListener('pointermove', (e) => { 
+                if(!drag) return; e.preventDefault(); 
+                el.style.transform = `translate(${e.clientX - ax}px, ${e.clientY - ay}px) scale(1.1)`; 
+            });
+            
+            el.addEventListener('pointerup', (e) => {
+                if(!drag) return; drag = false; 
+                el.releasePointerCapture(e.pointerId); 
+                el.style.zIndex = 50; el.style.transition = 'transform 0.3s';
+                el.style.visibility = 'hidden'; 
+                const bwh = document.elementFromPoint(e.clientX, e.clientY); 
+                el.style.visibility = 'visible';
+                
+                if(!fungsiCek(el, bwh)) { el.style.transform = 'translate(0,0)'; }
+            });
+        }
+
+        // --- 5. LOGIKA BUMI ---
+        let sBumiSmp = 0;
+        document.querySelectorAll('.b-sampah').forEach(s => {
+            setDrag(s, (el, bwh) => {
+                const t = bwh?.closest('.tong-sampah');
+                if(t && t.dataset.terima === el.dataset.jenis) { 
+                    el.style.transform = 'scale(0)'; 
+                    setTimeout(() => { el.style.display = 'none'; }, 300);
+                    sBumiSmp++; bJatuh(); 
+                    if(sBumiSmp === 4){ setTimeout(() => { bWin(); document.getElementById('sukses-bumi-1').style.display = 'flex'; }, 300); } 
+                    return true; 
+                } return false;
+            });
+        });
+
+        let sBumiBatu = 4;
+        function hancurBatuBumi(el) { 
+            if(el.classList.contains('objek-hancur')) return; 
+            initS(); bBatu(); el.classList.add('objek-hancur'); sBumiBatu--; 
+            if(sBumiBatu === 0) { 
+                document.getElementById('air-bumi').style.left = '0'; 
+                setTimeout(() => { bWin(); document.getElementById('sukses-bumi-2').style.display = 'flex'; }, 1000); 
+            } 
+        }
+
+        let sBumiPhn = 0;
+        function tumbuhPohonBumi(el) { 
+            initS(); bPohon(); let th = parseInt(el.dataset.tahap); 
+            if(th === 0){ el.innerText = "🌱"; el.dataset.tahap = '1'; el.style.borderColor = "var(--hijau-cerah)"; } 
+            else if(th === 1){ 
+                el.innerText = "🌳"; el.dataset.tahap = '2'; el.style.borderColor = "var(--hijau-lumut)"; el.style.pointerEvents = 'none'; el.style.background = "white"; sBumiPhn++; 
+                if(sBumiPhn === 3){ setTimeout(() => { bWin(); document.getElementById('sukses-bumi-3').style.display = 'flex'; }, 400); } 
+            } 
+        }
+
+        let sBumiKar = 0;
+        function tambahKarungBumi() { 
+            initS(); bJatuh(); sBumiKar++; 
+            if(sBumiKar <= 3) document.getElementById('kb' + sBumiKar).style.display = 'flex'; 
+            if(sBumiKar === 3){ setTimeout(() => { bWin(); document.getElementById('sukses-bumi-4').style.display = 'flex'; }, 500); } 
+        }
+
+        let sBumiHwn = 0;
+        document.querySelectorAll('.b-hewan').forEach(h => {
+            setDrag(h, (el, bwh) => { 
+                const b = bwh?.closest('#bukit-bumi'); 
+                if(b) { 
+                    el.style.position = 'relative'; el.style.bottom = 'auto'; el.style.left = 'auto'; el.style.transform = 'translate(0,0)'; b.appendChild(el); sBumiHwn++; bJatuh(); 
+                    if(sBumiHwn === 3){ setTimeout(() => { bWin(); document.getElementById('sukses-bumi-5').style.display = 'flex'; }, 400); } 
+                    return true; 
+                } return false; 
+            });
+        });
+
+        // --- 6. LOGIKA KESEHATAN ---
+        setDrag(document.querySelector('.k-sabun'), (el, bwh) => {
+            if(bwh?.closest('#k-tangan')) { 
+                el.style.transform = 'scale(0)';
+                setTimeout(() => { el.style.display = 'none'; }, 300);
+                document.getElementById('k-tangan').innerText = "🖐🏻✨"; bSihir(); 
+                setTimeout(() => { bWin(); document.getElementById('sukses-kes-1').style.display = 'flex'; }, 600); return true; 
+            } return false;
+        });
+
+        let sKesBot = 0;
+        function pakaiBotKes(el) { 
+            if(el.innerText === "🥾") return; initS(); bPop(); el.innerText = "🥾"; el.style.transform = "scale(1.2)"; setTimeout(() => el.style.transform = "scale(1)", 200); sKesBot++; 
+            if(sKesBot === 2) setTimeout(() => { bWin(); document.getElementById('sukses-kes-2').style.display = 'flex'; }, 400); 
+        }
+
+        let sKesKuman = 0;
+        function basmiKumanKes(el) { 
+            if(el.classList.contains('objek-hancur')) return; initS(); bPop(); el.classList.add('objek-hancur'); sKesKuman++; 
+            if(sKesKuman === 3) setTimeout(() => { bWin(); document.getElementById('sukses-kes-3').style.display = 'flex'; }, 400); 
+        }
+
+        setDrag(document.querySelector('.k-tutup'), (el, bwh) => {
+            if(bwh?.closest('#k-bak')) { 
+                el.style.display = 'none'; document.getElementById('k-bak').innerHTML = "<span style='font-size:clamp(3.5em, 10vh, 5em);margin-top:-30px;'>🛸</span>"; bJatuh(); 
+                setTimeout(() => { bWin(); document.getElementById('sukses-kes-4').style.display = 'flex'; }, 600); return true; 
+            } return false;
+        });
+
+        let sKesMandi = 0;
+        function mandiKes(el) { 
+            if(el.classList.contains('objek-hancur')) return; initS(); bSihir(); el.classList.add('objek-hancur'); sKesMandi++; 
+            if(sKesMandi === 2) setTimeout(() => { bWin(); document.getElementById('sukses-kes-5').style.display = 'flex'; }, 400); 
+        }
+
+        function salahPilih() { initS(); bSalah(); }
+        function benarMinum() { initS(); bWin(); document.getElementById('sukses-kes-6').style.display = 'flex'; }
+
+        // --- 7. LOGIKA SIAGA ---
+        function matikanListrik() { 
+            initS(); bPop(); document.getElementById('s-saklar').innerHTML = "<div style='font-size:clamp(5em, 18vh, 8em); filter: grayscale(100%);'>💡</div>"; document.getElementById('s-saklar').style.background = "#bdc3c7"; 
+            setTimeout(() => { bWin(); document.getElementById('sukses-siaga-1').style.display = 'flex'; }, 500); 
+        }
+
+        function cabutKabel() { 
+            initS(); bPop(); document.getElementById('s-kabel').style.top = "140px"; 
+            setTimeout(() => { bWin(); document.getElementById('sukses-siaga-2').style.display = 'flex'; }, 500); 
+        }
+
+        let sSiagaTas = 0;
+        document.querySelectorAll('.s-tas-item').forEach(i => {
+            setDrag(i, (el, bwh) => { 
+                const t = bwh?.closest('#s-tas'); 
+                if(t) { 
+                    el.style.transform = 'scale(0)'; setTimeout(() => { el.style.display = 'none'; }, 300);
+                    t.style.transform = "scale(1.2)"; setTimeout(() => t.style.transform = "scale(1)", 200); sSiagaTas++; bJatuh(); 
+                    if(sSiagaTas === 3){ setTimeout(() => { bWin(); document.getElementById('sukses-siaga-3').style.display = 'flex'; }, 400); } 
+                    return true; 
+                } return false; 
+            });
+        });
+
+        setDrag(document.querySelector('.s-dok'), (el, bwh) => {
+            if(bwh?.closest('#laci-atas')) { 
+                el.style.transform = 'scale(0)'; setTimeout(() => { el.style.display = 'none'; }, 300);
+                document.getElementById('laci-atas').innerText = "📁"; bJatuh(); 
+                setTimeout(() => { bWin(); document.getElementById('sukses-siaga-4').style.display = 'flex'; }, 400); return true; 
+            } return false;
+        });
+
+        function kunciPintu() { 
+            initS(); bPop(); document.getElementById('ikon-kunci').innerText = "🔒"; 
+            setTimeout(() => { bWin(); document.getElementById('sukses-siaga-5').style.display = 'flex'; }, 500); 
+        }
+
+        let sSiagaWrg = 0;
+        document.querySelectorAll('.s-warga').forEach(w => {
+            setDrag(w, (el, bwh) => { 
+                const p = bwh?.closest('#s-perahu'); 
+                if(p) { 
+                    el.style.position = 'relative'; el.style.bottom = 'auto'; el.style.left = 'auto'; el.style.transform = 'translate(0,0)'; p.appendChild(el); sSiagaWrg++; bJatuh(); 
+                    if(sSiagaWrg === 3){ setTimeout(() => { bWin(); document.getElementById('sukses-siaga-6').style.display = 'flex'; }, 400); } 
+                    return true; 
+                } return false; 
+            });
+        });
+    </script>
+</body>
+</html>
