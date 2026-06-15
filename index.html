@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Pahlawan Cilik - Petualangan Edukasi</title>
     
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐸</text></svg>">
+    
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;800;900&display=swap" rel="stylesheet">
@@ -74,18 +76,18 @@
         }
         .tombol-kembali:active { transform: translateY(4px); box-shadow: 0 0px 0px var(--hijau-asparagus); }
 
-        /* WADAH LOGO POJOK KANAN ATAS */
+        /* WADAH LOGO POJOK KANAN ATAS (UKURAN DIPERKECIL) */
         .wadah-logo-pojok {
             position: absolute;
             top: clamp(15px, 3vh, 25px);
             right: clamp(15px, 3vw, 25px);
             display: flex;
-            gap: clamp(8px, 2vw, 15px);
+            gap: clamp(8px, 1.5vw, 15px);
             z-index: 100;
         }
         .logo-pojok {
-            width: clamp(40px, 10vw, 70px);
-            height: clamp(40px, 10vw, 70px);
+            width: clamp(30px, 6vw, 55px);
+            height: clamp(30px, 6vw, 55px);
             object-fit: contain;
             filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));
         }
@@ -174,10 +176,6 @@
 </head>
 <body>
 
-    <!-- ==========================================================================
-         MUSIK LATAR CERIA (BGM) MULTI-SOURCE
-         Musik petualangan panjang, stabil, dan ramah anak.
-         ========================================================================== -->
     <audio id="musik-latar" loop preload="auto">
         <source src="https://cdn.pixabay.com/download/audio/2022/10/18/audio_31c2730e64.mp3?filename=happy-kids-122938.mp3" type="audio/mpeg">
         <source src="https://assets.mixkit.co/music/preview/mixkit-happy-times-158.mp3" type="audio/mpeg">
@@ -186,15 +184,12 @@
 
     <div class="gaya-kaca">
         
-        <!-- ==================== A. LAYAR PEMBUKA ==================== -->
         <div class="bagian-halaman bagian-aktif layar-tengah" id="layar-mulai">
             
-            <!-- LOGO POJOK KANAN ATAS -->
             <div class="wadah-logo-pojok">
-                <!-- Ganti src di bawah ini dengan link gambar aslinya -->
-                <img src="assets/unsurya.png" alt="Logo Unsurya" class="logo-pojok">
-                <img src="assets/bonpal.png" alt="Logo Kebon Pala" class="logo-pojok">
-                <img src="assets/dikti.png" alt="Logo Diktisaintek" class="logo-pojok">
+                <img src="assets/unsurya.png" alt="Logo Unsurya" class="logo-pojok" onerror="this.style.display='none'">
+                <img src="assets/bonpal.png" alt="Logo Kebon Pala" class="logo-pojok" onerror="this.style.display='none'">
+                <img src="assets/dikti.png" alt="Logo Diktisaintek" class="logo-pojok" onerror="this.style.display='none'">
             </div>
 
             <div class="emoji-jumbo" style="margin-bottom: 10px;">🐸</div>
@@ -203,7 +198,6 @@
             <button class="tombol-utama" style="margin-top: 15px;" onclick="mulaiAplikasi()">Mulai Bermain 🎵</button>
         </div>
 
-        <!-- ==================== B. MENU UTAMA ==================== -->
         <div class="bagian-halaman" id="halaman-menu">
             <button class="tombol-kembali" onclick="kembaliKeHome()">🐸 Kembali ke Awal</button>
             
@@ -227,7 +221,6 @@
             </div>
         </div>
 
-        <!-- ==================== C. PAHLAWAN BUMI ==================== -->
         <div class="bagian-halaman" id="bumi-1">
             <button class="tombol-kembali" onclick="kembaliMenu()">⬅️ Menu Utama</button>
             <div class="papan-permainan">
@@ -324,8 +317,7 @@
                 <h2 class="t-bumi">Misi 5: Evakuasi Hewan</h2>
                 <p>Geser semua hewan ke Bukit Aman!</p>
                 
-                <div class="area-evakuasi" style="overflow:visible;"> <!-- Override overflow agar hewan bebas digeser -->
-                    <div class="area-hewan-kiri">
+                <div class="area-evakuasi" style="overflow:visible;"> <div class="area-hewan-kiri">
                         <div class="item-seret b-hewan" style="top: 10%; left: 10%;"><div class="emoji-animasi">🐈</div></div>
                         <div class="item-seret b-hewan" style="top: 50%; left: 40%;"><div class="emoji-animasi" style="animation-delay: 0.5s;">🐕</div></div>
                         <div class="item-seret b-hewan" style="top: 30%; left: 60%;"><div class="emoji-animasi" style="animation-delay: 1s;">🐓</div></div>
@@ -342,7 +334,6 @@
             </div>
         </div>
 
-        <!-- ==================== D. PAHLAWAN KESEHATAN ==================== -->
         <div class="bagian-halaman" id="kes-1">
             <button class="tombol-kembali" onclick="kembaliMenu()">⬅️ Menu Utama</button>
             <div class="papan-permainan">
@@ -462,7 +453,6 @@
             </div>
         </div>
 
-        <!-- ==================== E. PAHLAWAN SIAGA ==================== -->
         <div class="bagian-halaman" id="siaga-1">
             <button class="tombol-kembali" onclick="kembaliMenu()">⬅️ Menu Utama</button>
             <div class="papan-permainan">
@@ -584,9 +574,6 @@
 
     </div>
 
-    <!-- ==========================================================================
-         JAVASCRIPT LOGIC & AUDIO
-         ========================================================================== -->
     <script>
         // --- 1. MUSIK LATAR (BGM) MULTI-SOURCE ---
         let musikDimainkan = false;
@@ -658,7 +645,7 @@
                 initS(); mainkanMusikBGM(); bPop(); 
                 drag = true; ax = e.clientX; ay = e.clientY; 
                 el.setPointerCapture(e.pointerId); 
-                el.style.zIndex = 9999; 
+                el.style.zIndex = 9999; /* Z-INDEX TINGGI SAAT DISERET */
                 el.style.transition = 'none'; 
             });
             
@@ -675,6 +662,7 @@
                 const bwh = document.elementFromPoint(e.clientX, e.clientY); 
                 el.style.visibility = 'visible';
                 
+                // Panggil fungsi cek, jika gagal kembalikan ke tempat semula
                 if(!fungsiCek(el, bwh)) { el.style.transform = 'translate(0,0)'; }
             });
         }
@@ -685,7 +673,7 @@
             setDrag(s, (el, bwh) => {
                 const t = bwh?.closest('.tong-sampah');
                 if(t && t.dataset.terima === el.dataset.jenis) { 
-                    el.style.transform = 'scale(0)'; 
+                    el.style.transform = 'scale(0)'; /* Animasi menyusut */
                     setTimeout(() => { el.style.display = 'none'; }, 300);
                     sBumiSmp++; bJatuh(); 
                     if(sBumiSmp === 4){ setTimeout(() => { bWin(); document.getElementById('sukses-bumi-1').style.display = 'flex'; }, 300); } 
